@@ -90,20 +90,6 @@ class WireMangaSetup extends Wire {
 		];
 	}
 
-	protected function copyFiles($src, $dest) {
-		$files = scandir($src);
-		@mkdir($dest);
-		foreach($files as $file) {
-			if($file !== "." && $file !== ".."){
-				if(is_dir("$src/$file")){
-					$this->copyFiles("$src/$file", "$dest/$file");
-				} else {
-					copy("$src/$file", "$dest/$file");
-				}
-			}
-		}
-	}
-
 	/** 
 	 * Create templates when module is installed
 	 */
