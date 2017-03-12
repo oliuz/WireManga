@@ -4,8 +4,7 @@
  *
  */
 
-class WireMangaReader extends Process
-{
+class WireMangaReader extends Process {
 
 	protected $page;
 	protected $urlSegment1;
@@ -15,7 +14,6 @@ class WireMangaReader extends Process
 	public function __construct($urlSegment1) {
 		$this->page = wire("page");
 		$this->urlSegment1 = $urlSegment1;
-		
 		$chaptersCache = $this->cache->get("siblings:" . $this->page->parent->id, function() {
 			return array_values($this->page->siblings("template=wm_chapters, wm_chapter_images>0")->sort('name')->explode('name'));
 		});
@@ -23,21 +21,16 @@ class WireMangaReader extends Process
 		$this->arrKey = array_search($this->page->name, $this->chapters);
 	}
 
-
-	/*
-	|--------------------------------------------------------------------------
-	| Number of images in this chapter
-	|--------------------------------------------------------------------------
-	*/
+	/** 
+	 * Number of images in chapter
+	 */
 	public function imagesCount() {
 		return count($this->chapterImages());
 	}
 
-	/*
-	|--------------------------------------------------------------------------
-	| Number of images in this chapter
-	|--------------------------------------------------------------------------
-	*/
+	/** 
+	 * Url of next chapter
+	 */
 	public function nextChapter() {
 		// link to the next chapter
 		$nextChapterLink = $this->page->parent->url;
@@ -52,6 +45,9 @@ class WireMangaReader extends Process
 		return $nextChapterLink;
 	}
 
+	/** 
+	 * Url of next page
+	 */
 	public function nextPage() {
 		// link to next page/image
 		$next = $this->page->url . ($this->urlSegment1 + 1)."/";
@@ -62,6 +58,9 @@ class WireMangaReader extends Process
 		return $next;
 	}
 
+	/** 
+	 * Url of previous chapter
+	 */
 	public function prevChapter() {
 		// link to the previous chapter
 		$prevChapterLink = $this->page->parent->url;
@@ -76,6 +75,9 @@ class WireMangaReader extends Process
 		return $prevChapterLink;
 	}
 
+	/** 
+	 * Url of previous page
+	 */
 	public function prevPage() {
 		// link to previous page/image
 		$prev = $this->page->url . ($this->urlSegment1-1)."/";
@@ -86,16 +88,17 @@ class WireMangaReader extends Process
 		return $prev;
 	}
 
+	/** 
+	 * Source url of viewed image
+	 */
 	public function imageSrc() {
 		$currentImage = $this->urlSegment1 - 1;
 		return $this->chapterImages()->eq($currentImage)->url;
 	}
 
-	/*
-	|--------------------------------------------------------------------------
-	| Sort the images in this chapter
-	|--------------------------------------------------------------------------
-	*/
+	/** 
+	 * Sort the images in the chapter
+	 */
 	public function chapterImages() {
 		$page = $this->wire("page");
 		$array = $page->wm_chapter_images->getArray();
@@ -105,6 +108,9 @@ class WireMangaReader extends Process
 		return $imagesArray;
 	}
 
+	/** 
+	 * Pages/Images drop-down on the reader page
+	 */
 	public function pagesList() {
 		$page = $this->page;
 		$pageList = "";
@@ -119,6 +125,9 @@ class WireMangaReader extends Process
 		return $pageList;
 	}
 
+	/** 
+	 * Chapters drop-down on the reader page
+	 */
 	public function chaptersList() {
 		$page = $this->page;
 		$chapterList = "";
