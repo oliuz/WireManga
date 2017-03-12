@@ -22,46 +22,25 @@ class WireManga extends Process {
 	}
 
 
-	protected function processSettings() {
-		if($this->wire("input")->post->submit) {
-			$sanitizer = $this->wire("sanitizer");
-			$site_email = $this->wire("input")->post->wm_site_email;
-			if($site_email && $site_email !== $sanitizer->email($site_email)) {
-				return $this->error("Email is not valid!");
-			}
-
-			$site_name = $this->wire("input")->post->wm_site_name;
-			if($site_name && $site_name !== $sanitizer->text($site_name)) {
-				return $this->error("Site name is not valid!");
-			}
-
-			$user_activate = $this->wire("input")->post->wm_user_activate;
-			if($user_activate && $user_activate != 0 && $user_activate != 1) {
-				return $this->error("Site name is not valid!");
-			}
-
-	 		$data['wm_site_email'] = $site_email;
-	 		$data['wm_site_name'] = $site_name;
-	 		$data['wm_user_activate'] = $user_activate;
-			$this->wire("modules")->saveConfig("WireManga", $data);
-			$this->wire("session")->redirect("./");
-		}
-	}
-
-
 	public function ready() {
-		require_once('Reader.php');
 		$page = $this->wire("page");
-		$this->wire("manga", $this);
-		$settings = $this->wire("pages")->get("path=/settings/");
-		$this->wire("settings", $settings);
-		if(true) {
+		// initialize wm variable for use on front end
+		$this->wire("wm", $this);
+		if($page->template->name == "wm_chapters") {
+			require_once('Reader.php');
+			// initialize reader variable for use on front end
 			$reader = new WireMangaReader($this->input->urlSegment1);
 			$this->wire("reader", $reader);
 		}
 	}
 
-
+	/** 
+	 * Get latest chapters list
+	 *
+	 * @param int $limit Number of chapters to get
+	 *
+	 * @return string
+	 */
 	public function latestChapters($limit) {
 		$chapters = $this->wire("pages")->find("template=wm_chapters,sort=-created, limit={$limit}");
 		$out = "<div class='wm-chapters-list'>";
@@ -72,23 +51,15 @@ class WireManga extends Process {
 		return $chapters;
 	}
 
-	public function getChapters($pageID = null) {
-		if($pageID === null) {
-			$chapters = $this->wire("page")->wm_chapters->sort('name');
-		}
-		else {
-			$p = $this->wire('pages')->get("id={$pageID}");
-			$chapters = $p->wm_chapters->sort('name');
-		}
-		$chArray = [];
-		$x = 0;
-		foreach($chapters as $c) {
-			$chArray[$c->wm_chapter_volume][$c->title] = $c->chapterName;
-		}
-		return $chArray;
-	}
-
-
+	/** 
+	 * Get chapters list
+	 *
+	 * @param Page $page Page (manga) to get chapters from
+	 * @param string $header Text to be displayed before the chapters list
+	 * @param array $classes Array of classses used in the returned markup
+	 *
+	 * @return string
+	 */
 	public function chaptersList($page, $header, $classes) {
 		// set default classes
 		if(empty($classes)){

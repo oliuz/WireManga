@@ -10,7 +10,10 @@ class WireMangaSetup extends Wire {
 	 */
 	public function install() {
 		$this->setArrays();
-		$this->create();
+		$this->createTemplates();
+		$this->createPages();
+		$this->createFields();
+
 		$initFile = $this->config->paths->siteModules . "WireManga/Hooks/init.php";
 		if(!file_exists($initFile)) {
 			copy($initFile, $this->config->paths->site);
@@ -37,7 +40,9 @@ class WireMangaSetup extends Wire {
 	 */
 	public function uninstall() {
 		$this->setArrays();
-		$this->delete();
+		$this->deletePages();
+		$this->deleteFields();
+		$this->deleteTemplates();
 	}
 
 	protected $templates_;
@@ -99,12 +104,9 @@ class WireMangaSetup extends Wire {
 		}
 	}
 
-	public function create() {
-		$this->createTemplates();
-		$this->createPages();
-		$this->createFields();
-	}
-
+	/** 
+	 * Create templates when module is installed
+	 */
 	protected function createTemplates() {
 		// loop the templates array and create the templates
 		foreach($this->templates_ as $tpl) {
@@ -149,6 +151,9 @@ class WireMangaSetup extends Wire {
 		$t->save();
 	}
 
+	/** 
+	 * Create fields when module is installed
+	 */
 	protected function createFields() {
 		foreach($this->fields_ as $field) {
 			$template_id = $this->wire("templates")->get("name={$field["add_to"]}")->id;
@@ -219,6 +224,7 @@ class WireMangaSetup extends Wire {
 	 * @param string $repeaterName The name of your repeater field
 	 * @param string $repeaterFields List of field names to add to the repeater, separated by spaces
 	 * @param string $repeaterLabel The label for your repeater
+	 * @param string $template_id ID of template used for pages created/selected by this field
 	 * @param string $repeaterTags Tags for the repeater field
 	 * @return Returns the new Repeater field
 	 *
@@ -351,11 +357,4 @@ class WireMangaSetup extends Wire {
 			}
 		}
 	}
-
-	protected function delete() {
-		$this->deletePages();
-		$this->deleteFields();
-		$this->deleteTemplates();
-	}
-
 }
