@@ -14,10 +14,6 @@ class WireMangaSetup extends Wire {
 		$this->createPages();
 		$this->createFields();
 
-		$initFile = $this->config->paths->siteModules . "WireManga/Hooks/init.php";
-		if(!file_exists($initFile)) {
-			copy($initFile, $this->config->paths->site);
-		}
 		// Change title field in the wm_chapters template context
 		$t = $this->wire("templates")->get("name=wm_chapters");
 		$f = $t->fieldgroup->getField('title', true);
